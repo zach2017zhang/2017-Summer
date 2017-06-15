@@ -1,0 +1,22 @@
+
+MEX := /Applications/MATLAB_R2016a.app/bin/mex
+
+all:
+	cd $(PWD)/gco-v3.0; make -f Makefile.darwin MEX=$(MEX); \
+	cd $(PWD)/toolbox/channels/private; make -f Makefile.darwin MEX=$(MEX); \
+	cd $(PWD)/toolbox/classify/private; make -f Makefile.darwin MEX=$(MEX); \
+	cd $(PWD)/toolbox/detector/private; make -f Makefile.darwin MEX=$(MEX); \
+	cd $(PWD)/toolbox/images/private; make -f Makefile.darwin MEX=$(MEX); \
+	cd $(PWD)/toolbox/matlab/private; make -f Makefile.darwin MEX=$(MEX); \
+	cd $(PWD)/toolbox/videos/private; make -f Makefile.darwin MEX=$(MEX); \
+	cd $(PWD)/EdgeDetector/private; make -f Makefile.darwin MEX=$(MEX)
+
+clean:
+	cd $(PWD)/gco-v3.0; make -f Makefile.darwin clean; \
+	cd $(PWD)/toolbox/channels/private; make -f Makefile.darwin clean; \
+	cd $(PWD)/toolbox/classify/private; make -f Makefile.darwin clean; \
+	cd $(PWD)/toolbox/detector/private; make -f Makefile.darwin clean; \
+	cd $(PWD)/toolbox/images/private; make -f Makefile.darwin clean; \
+	cd $(PWD)/toolbox/matlab/private; make -f Makefile.darwin clean; \
+	cd $(PWD)/toolbox/videos/private; make -f Makefile.darwin clean; \
+	cd $(PWD)/EdgeDetector/private; make -f Makefile.darwin clean

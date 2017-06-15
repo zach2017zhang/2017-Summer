@@ -1,0 +1,22 @@
+
+MEX := /Applications/MATLAB_R2016a.app/bin/mex
+
+all:
+	cd $(PWD)/gco-v3.0; make MEX=$(MEX); \
+	cd $(PWD)/toolbox/channels/private; make MEX=$(MEX); \
+	cd $(PWD)/toolbox/classify/private; make MEX=$(MEX); \
+	cd $(PWD)/toolbox/detector/private; make MEX=$(MEX); \
+	cd $(PWD)/toolbox/images/private; make MEX=$(MEX); \
+	cd $(PWD)/toolbox/matlab/private; make MEX=$(MEX); \
+	cd $(PWD)/toolbox/videos/private; make MEX=$(MEX); \
+	cd $(PWD)/EdgeDetector/private; make MEX=$(MEX)
+
+clean:
+	cd $(PWD)/gco-v3.0; make clean; \
+	cd $(PWD)/toolbox/channels/private; make clean; \
+	cd $(PWD)/toolbox/classify/private; make clean; \
+	cd $(PWD)/toolbox/detector/private; make clean; \
+	cd $(PWD)/toolbox/images/private; make clean; \
+	cd $(PWD)/toolbox/matlab/private; make clean; \
+	cd $(PWD)/toolbox/videos/private; make clean; \
+	cd $(PWD)/EdgeDetector/private; make clean

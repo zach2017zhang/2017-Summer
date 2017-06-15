@@ -1,0 +1,47 @@
+git clone https://github.com/qugank/PG-framework.git
+
+cd PG-framework/
+
+# get cgo-v3 because the one packaged with PG-framework doesn't work
+rm -rf cgo-v3.0/*
+cd cgo-v3.0
+wget http://vision.csd.uwo.ca/code/gco-v3.0.zip
+unzip gco-v3.0.zip
+
+# must compile cgo_matlab.cpp
+export PATH=/pkgs/matlab-83/bin:$PATH
+cd matlab
+mex -v GCC=/usr/bin/gcc-4.7 gco_matlab.cpp ../GCoptimization.cpp ../LinkedBlockList.cpp -lut
+
+# also compile graph.cpp and maxflow.cpp in cgo-v3.0
+cd ..
+mex -v GCC=/usr/bin/gcc-4.7 graph.cpp
+mex -v GCC=/usr/bin/gcc-4.7 maxflow.cpp
+
+# now the piotr_toolbox
+cd PG-framework/toolbox/toolbox/classify/private
+mex -v GCC=/usr/bin/gcc-4.7 fernsInds1.c
+mex -v GCC=/usr/bin/gcc-4.7 meanShift1.c
+mex -v GCC=/usr/bin/gcc-4.7 forestFindThr.cpp
+mex -v GCC=/usr/bin/gcc-4.7 forestInds.cpp
+
+cd PG-framework/toolbox/toolbox/channels/private
+for i in *.cpp *.c; do mex -v GCC=/usr/bin/gcc-4.7 $i; done
+
+cd PG-framework/toolbox/toolbox/images/private
+for i in *.cpp *.c; do mex -v GCC=/usr/bin/gcc-4.7 $i; done
+
+cd PG-framework/toolbox/toolbox/matlab/private
+mex -v GCC=/usr/bin/gcc-4.7 dijkstra1.cpp fibheap.cpp
+
+cd PG-framework/EdgeDetector/privaten
+for i in *.cpp *.c; do mex -v GCC=/usr/bin/gcc-4.7 $i; done
+
+
+
+# start matlab and inside matlab run
+
+addpath /Users/relu/PG-framework /Users/relu/PG-framework/matlab /Users/relu/PG-framework/EdgeDetector /Users/relu/PG-framework/gco-v3.0/matlab /Users/relu/PG-framework/toolbox/matlab /Users/relu/PG-framework/toolbox/channels /Users/relu/PG-framework/toolbox/images /Users/relu/PG-framework/toolbox/videos /Users/relu/PG-framework/toolbox/classify /Users/relu/PG-framework/toolbox/filters 
+
+
+

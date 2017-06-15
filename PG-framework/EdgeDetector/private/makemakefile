@@ -1,0 +1,33 @@
+#/bin/bash
+
+UNAME_S=`uname -s`
+
+
+if [ $UNAME_S == "Linux" ]
+then
+  SUFF="mexa64"
+elif [ $UNAME_S == "Darwin" ]
+then
+  SUFF="mexmaci64"
+else
+  echo "Making Makefile for $UNAME_S architecture not supported."
+  exit 1
+fi
+
+
+FILES=`ls *.c*`
+BINF=`echo $FILES | sed "s/\.c /.$SUFF /g"`
+BINF=`echo $BINF | sed "s/\.c$/.$SUFF/g"`
+BINF=`echo $BINF | sed "s/\.cpp /.$SUFF /g"`
+BINF=`echo $BINF | sed "s/\.cpp$/.$SUFF/g"`
+
+
+echo -e "all: $BINF\n" > Makefile
+
+for i in `ls *.c*`
+do 
+  PREF=`echo $i | cut -f1 -d'.'`
+  echo -e "$PREF.$SUFF: $i\n\t\$(MEX) $i\n" >> Makefile
+done
+
+echo -e "clean:\n\trm -f *.$SUFF" >> Makefile

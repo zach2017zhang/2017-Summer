@@ -1,0 +1,16 @@
+all: edgeBoxesMex.mexmaci64 edgesDetectMex.mexmaci64 edgesNmsMex.mexmaci64 spDetectMex.mexmaci64
+
+edgeBoxesMex.mexmaci64: edgeBoxesMex.cpp
+	$(MEX) edgeBoxesMex.cpp
+
+edgesDetectMex.mexmaci64: edgesDetectMex.cpp
+	$(MEX) edgesDetectMex.cpp
+
+edgesNmsMex.mexmaci64: edgesNmsMex.cpp
+	$(MEX) edgesNmsMex.cpp
+
+spDetectMex.mexmaci64: spDetectMex.cpp
+	$(MEX) spDetectMex.cpp
+
+clean:
+	rm -f *.mexmaci64

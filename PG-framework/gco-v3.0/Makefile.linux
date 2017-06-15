@@ -1,0 +1,13 @@
+all: gco_matlab.mexa64 GCoptimization.mexa64 LinkedBlockList.mexa64
+
+gco_matlab.mexa64: gco_matlab.cpp GCoptimization.cpp LinkedBlockList.cpp
+	$(MEX) gco_matlab.cpp GCoptimization.cpp LinkedBlockList.cpp -lut GCC=$(GCC)
+
+GCoptimization.mexa64: GCoptimization.cpp
+	$(MEX) -c GCoptimization.cpp GCC=$(GCC)
+
+LinkedBlockList.mexa64: LinkedBlockList.cpp
+	$(MEX) -c LinkedBlockList.cpp GCC=$(GCC)
+
+clean:
+	rm -f gco_matlab.mexa64 GCoptimization.mexa64 LinkedBlockList.mexa64

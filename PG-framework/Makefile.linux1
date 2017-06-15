@@ -1,0 +1,13 @@
+all: ktComputeW_c.mexa64 ktHistcRgb_c.mexa64 opticalFlowHsMex.mexa64
+
+ktComputeW_c.mexa64: ktComputeW_c.c
+	$(MEX) ktComputeW_c.c
+
+ktHistcRgb_c.mexa64: ktHistcRgb_c.c
+	$(MEX) ktHistcRgb_c.c
+
+opticalFlowHsMex.mexa64: opticalFlowHsMex.cpp
+	$(MEX) opticalFlowHsMex.cpp
+
+clean:
+	rm -f *.mexa64

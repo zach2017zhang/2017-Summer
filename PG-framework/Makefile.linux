@@ -1,0 +1,23 @@
+
+MEX := /pkgs/matlab-R2016a/bin/mex
+GCC := /usr/bin/gcc-4.7
+
+all:
+	cd $(PWD)/gco-v3.0; make -f Makefile.linux MEX=$(MEX) GCC=$(GCC); \
+	cd $(PWD)/toolbox/channels/private; make -f Makefile.linux MEX=$(MEX) GCC=$(GCC); \
+	cd $(PWD)/toolbox/classify/private; make -f Makefile.linux MEX=$(MEX) GCC=$(GCC); \
+	cd $(PWD)/toolbox/detector/private; make -f Makefile.linux MEX=$(MEX) GCC=$(GCC); \
+	cd $(PWD)/toolbox/images/private; make -f Makefile.linux MEX=$(MEX) GCC=$(GCC); \
+	cd $(PWD)/toolbox/matlab/private; make -f Makefile.linux MEX=$(MEX) GCC=$(GCC); \
+	cd $(PWD)/toolbox/videos/private; make -f Makefile.linux MEX=$(MEX) GCC=$(GCC); \
+	cd $(PWD)/EdgeDetector/privaten; make -f Makefile.linux MEX=$(MEX) GCC=$(GCC)
+
+clean:
+	cd $(PWD)/gco-v3.0; make -f Makefile.linux clean; \
+	cd $(PWD)/toolbox/channels/private; make -f Makefile.linux clean; \
+	cd $(PWD)/toolbox/classify/private; make -f Makefile.linux clean; \
+	cd $(PWD)/toolbox/detector/private; make -f Makefile.linux clean; \
+	cd $(PWD)/toolbox/images/private; make -f Makefile.linux clean; \
+	cd $(PWD)/toolbox/matlab/private; make -f Makefile.linux clean; \
+	cd $(PWD)/toolbox/videos/private; make -f Makefile.linux clean; \
+	cd $(PWD)/EdgeDetector/privaten; make -f Makefile.linux clean
