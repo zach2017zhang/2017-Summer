@@ -1,4 +1,4 @@
-function Sortedbbs = Showbbs(ContourList,bbs,I) %,m,p,spb) 
+function Sortedbbs = Showbbs(ContourList,bbs,I,m) %,m,p,spb) 
     
     numBoxes = size(bbs,1); % Get the number of boxes proposed
     
@@ -19,11 +19,14 @@ function Sortedbbs = Showbbs(ContourList,bbs,I) %,m,p,spb)
     % Normbbs = (Selectedbbs - min(Selectedbbs))/(max(Selectedbbs) - ...
     %     min(Selectedbbs)); % Normalize the selected score for drawBoxes function
     
+    figure(6),im(I);
+    title('Zach PG bbs');
+    hold on;
     
-    % for i=1:m           
-    %  figure(5),drawBoxes(Sortedbbs(numBoxes+1-i,:)+[0 0 Sortedbbs(numBoxes+1-i,1) ...
-    %      Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
-    %      'color','red'); % Draw the boxes
-    % end
+    for i=1:m           
+      figure(6),drawBoxes(Sortedbbs(numBoxes+1-i,:)+[0 0 Sortedbbs(numBoxes+1-i,1) ...
+          Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
+          'color','red'); % Draw the boxes
+     end
   
 end

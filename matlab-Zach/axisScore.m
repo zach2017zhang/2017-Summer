@@ -1,4 +1,4 @@
-function s = axisScore(spb,sbbs,E,n)
+function s = axisScore(ContourList,spb,sbbs,E,n)
     axisMatrix = spb.thin>0.3;
     m = sbbs(1);
     k = sbbs(2);
@@ -25,11 +25,16 @@ function s = axisScore(spb,sbbs,E,n)
     %    s = 0;
     % end
     ScalesMap = spb.scalesMap;
-    axisScalesArray = ScalesMap(logical(axisMatrix));
+    axisScalesArray = spb.scales(ScalesMap(logical(axisMatrix)));
     axisArea = 2 * sum(axisScalesArray);
     if n==1
         s = axisArea/boxArea^2/n;
     else
         s = 0;
     end
+    
+    % calculate IoU
+    IoU = IoUCalculation(ContourList,m,k,w,h,spb);
+    s = s*IoU;
+    
 end

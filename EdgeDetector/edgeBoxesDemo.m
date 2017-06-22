@@ -28,6 +28,6 @@ title('green=matched gt  red=missed gt  dashed-green=matched detect');
 if(~exist('boxes/VOCdevkit/','dir')), return; end
 split='val'; data=boxesData('split',split);
 nm='EdgeBoxes70'; opts.name=['boxes/' nm '-' split '.mat'];
-edgeBoxes(data.imgs,model,opts); opts.name=[];
-boxesEval('data',data,'names',nm,'thrs',.7,'show',2);
-boxesEval('data',data,'names',nm,'thrs',.5:.05:1,'cnts',1000,'show',3);
+edgeBoxesfortest(data.imgs,model,opts); opts.name=[];
+boxesEval('data',data,'names',nm,'thrs',.7,'show',2,'cnts',10000);
+%boxesEval('data',data,'names',nm,'thrs',.5:.05:1,'cnts',1000,'show',3);

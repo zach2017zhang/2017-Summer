@@ -1,4 +1,4 @@
-function [newContourList diffMatrix flagList] =  colorGroup(ContourList,I)
+function newContourList =  colorGroup(ContourList,I)
  numGroups = size(ContourList,2);
  newContourList = {};
  
@@ -57,7 +57,7 @@ function [newContourList diffMatrix flagList] =  colorGroup(ContourList,I)
  end
  
  % diffMatrix = diffMatrix < 0.01 * sqrt((255)^2+(255)^2+(255)^2);
- excludeIndex = zeros(numGroups);
+ % excludeIndex = zeros(numGroups);
  
  flagList = zeros(numGroups,1);
  flagList(1)=1;
@@ -68,13 +68,13 @@ function [newContourList diffMatrix flagList] =  colorGroup(ContourList,I)
      for j = i+1:numGroups
          
          if flagList(j)==0
-             if diffMatrix((i-1)*numGroups+j,3) <= 0.03 * sqrt((255)^2+(255)^2+(255)^2);
+             if diffMatrix((i-1)*numGroups+j,3) <= 0.02 * sqrt((255)^2+(255)^2+(255)^2);
                  flagList(j)=i;
              else
                  flagList(j)=j;
              end
          else
-             if diffMatrix((i-1)*numGroups+j,3) <= 0.03 * sqrt((255)^2+(255)^2+(255)^2);
+             if diffMatrix((i-1)*numGroups+j,3) <= 0.02 * sqrt((255)^2+(255)^2+(255)^2);
                  flagList(j)=flagList(i);
              end
          end         
