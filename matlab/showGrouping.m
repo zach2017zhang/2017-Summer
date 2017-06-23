@@ -1,4 +1,4 @@
-function h = showGrouping(ConSegList, label, path )
+function h = showGrouping(ConSegList, label, im )
 %SHOWGROUPING Visualize the edge grouping results
 %   ConSegList  - The edge segments.
 %   label       - The output optimal label given previously.
@@ -6,8 +6,8 @@ function h = showGrouping(ConSegList, label, path )
 
 addpath(pwd);
 load colors.mat;
-        
-im = imread(path);
+
+if ischar(im), im = imread(im); end
 img = ones(size(im));
 img = logical(img);
 h=figure('visible','on','Position',[10,10,size(img,1),size(img,2)]);imshow(img);

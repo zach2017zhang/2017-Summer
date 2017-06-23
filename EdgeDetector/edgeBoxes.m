@@ -2,7 +2,7 @@ function bbs = edgeBoxes( I, model, varargin )
 % Generate Edge Boxes object proposals in given image(s).
 %
 % Compute Edge Boxes object proposals as described in:
-%  C. Lawrence Zitnick and Piotr Dollár
+%  C. Lawrence Zitnick and Piotr Dollï¿½r
 %  "Edge Boxes: Locating Object Proposals from Edges", ECCV 2014.
 % The proposal boxes are fast to compute and give state-of-the-art recall.
 % Please cite the above paper if you end up using the code.
@@ -72,7 +72,12 @@ o=getPrmDflt(varargin,dfs,1); if(nargin==0), bbs=o; return; end
 % run detector possibly over multiple images and optionally save results
 f=o.name; if(~isempty(f) && exist(f,'file')), bbs=1; return; end
 if(~iscell(I)), bbs=edgeBoxesImg(I,model,o); else n=length(I);
-  bbs=cell(n,1); parfor i=1:n, bbs{i}=edgeBoxesImg(I{i},model,o); end; end
+  bbs=cell(n,1); 
+  for i=1:n, 
+%   parfor i=1:n, 
+      bbs{i}=edgeBoxesImg(I{i},model,o); fprintf('%d\n',i);
+  end; 
+end
 d=fileparts(f); if(~isempty(d)&&~exist(d,'dir')), mkdir(d); end
 if(~isempty(f)), save(f,'bbs'); bbs=1; end
 
@@ -80,11 +85,32 @@ end
 
 function bbs = edgeBoxesImg( I, model, o )
 % Generate Edge Boxes object proposals in single image.
+[~,imageId] = fileparts(I);
 if(all(ischar(I))), I=imread(I); end
-model.opts.nms=0; [E,O]=edgesDetect(I,model);
+model.opts.nms=0; 
+[E,O]=edgesDetect(I,model); % edge map
 if(0), E=gradientMag(convTri(single(I),4)); E=E/max(E(:)); end
 E=edgesNmsMex(E,O,2,0,1,model.opts.nThreads);
 bbs=edgeBoxesMex(E,O,o.alpha,o.beta,o.minScore,o.maxBoxes,...
-  o.edgeMinMag,o.edgeMergeThr,o.clusterMinMag,...
-  o.maxAspectRatio,o.minBoxArea,o.gamma,o.kappa);
+ o.edgeMinMag,o.edgeMergeThr,o.clusterMinMag,...
+ o.maxAspectRatio,o.minBoxArea,o.gamma,o.kappa);
+
+switch model.opts.scoringMethod
+    case {'spbmil', 'spb'}
+        % @Zach: Add "data" directory and inside it a sym link to MilResult
+        milPath = fullfile('data','MilResult',[imageId '.mat']);
+        % In our case, the edge map is only used to compute bounding box proposals
+        spb = load(milPath); spb = spb.spb; % symmetry map
+        E = spb.thin>0.3;   % TODO: decide on threshold
+        SegList  = GetConSeg(E);
+        labels = GestaltGroupRsvm(SegList,[1.1007 -0.0011],0.5000);
+        contourList = groupContours(labels, SegList);
+        bbs =  spbShowbbs(contourList,bbs,I,spb);
+    case {'pgroup', 'pg'}
+        SegList  = GetConSeg(E);
+        labels = GestaltGroupRsvm(SegList,[1.1007 -0.0011],0.5000);
+        bbs = ScoringBoxesMex(SegList,labels,[1.1007 -0.0011],O,E,o.alpha,...
+            o.beta,o.minBoxArea,o.maxAspectRatio,o.maxBoxes);
+    otherwise % do nothing
+end
 end

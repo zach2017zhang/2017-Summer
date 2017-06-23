@@ -10,9 +10,10 @@ opts.alpha = .65;     % step size of sliding window search
 opts.beta  = .75;     % nms threshold for object proposals
 opts.minScore = .01;  % min score of boxes to detect
 opts.maxBoxes = 1e4;  % max number of boxes to detect
+model.opts.scoringMethod = 'spbmil';
 
 %% detect Edge Box bounding box proposals (see edgeBoxes.m)
-I = imread('paperplanes.png');
+I = imread('peppers.png');
 tic, bbs=edgeBoxes(I,model,opts); toc
 
 %% show evaluation results (using pre-defined or interactive boxes)
@@ -26,8 +27,10 @@ title('green=matched gt  red=missed gt  dashed-green=matched detect');
 
 %% run and evaluate on entire dataset (see boxesData.m and boxesEval.m)
 if(~exist('boxes/VOCdevkit/','dir')), return; end
+% split='val'; data=boxesData('resDir','boxes/','dataDir','data/VOCdevkit/','split',split);
 split='val'; data=boxesData('split',split);
 nm='EdgeBoxes70'; opts.name=['boxes/' nm '-' split '.mat'];
+edgeBoxes(data.imgs,model,opts); opts.name=[];
 edgeBoxesfortest(data.imgs,model,opts); opts.name=[];
-boxesEval('data',data,'names',nm,'thrs',.7,'show',2,'cnts',10000);
+boxesEval('data',data,'names',nm,'thrs',.7,'show',2,'cnts',1000);
 %boxesEval('data',data,'names',nm,'thrs',.5:.05:1,'cnts',1000,'show',3);
