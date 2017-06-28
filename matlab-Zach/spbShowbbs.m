@@ -1,4 +1,4 @@
-function Sortedbbs = spbShowbbs(ContourList,bbs,I,spb) 
+function Sortedbbs = spbShowbbs(ContourList,bbs,I,spb,num) 
     
     numBoxes = size(bbs,1); % Get the number of boxes proposed
     
@@ -19,13 +19,14 @@ function Sortedbbs = spbShowbbs(ContourList,bbs,I,spb)
     % Normbbs = (Selectedbbs - min(Selectedbbs))/(max(Selectedbbs) - ...
     %     min(Selectedbbs)); % Normalize the selected score for drawBoxes function
     
-     %figure(),im(I);
-    % hold on;
-     %title('axis bbs');
+     figure(),im(I);
+     hold on;
+     title('axis bbs');
     
-     %for i=1:num          
-     %     Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
-     %    'color','red'); % Draw the boxes
-     %end
+     for i=1:num          
+         drawBoxes(Sortedbbs(numBoxes+1-i,:)+[0 0 Sortedbbs(numBoxes+1-i,1) ...
+          Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
+          'color','red'); % Draw the boxes
+     end
   
 end

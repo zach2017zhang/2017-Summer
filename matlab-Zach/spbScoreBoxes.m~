@@ -1,4 +1,4 @@
-function Sortedbbs = spbScoreBoxes(ContourList,bbs,I,spb,num)
+function sortedbbs = spbScoreBoxes(ContourList,bbs,I,spb,num)
 % I will layout the steps that you have to code to make it easier for you.
 % It's better if you (at least try to) do it yourself for practice.
 
@@ -44,27 +44,21 @@ rect = getMask(spb); %%%%% 1.rect{s,o}%%%
 
 % precalcualte the reconstructed image for each contour group
 axisReCell={};
-numContours = size(ContourList,2); % # of contour groups
-
-for i=1:numContours
-    numPixels = size(ContourList{1,i},1);
-    axisPic = zeros(size(I,1),size(I,2));
-    for j=1:numPixels
-        X = ContourList{1,i}(j,2);
-        Y = ContourList{1,i}(j,1);
-        mask = rect{spb.scalesMap(Y,X),spb.orientMap(Y,X)};
-        % extract the correct rectangle from precalculated rect{}
-        axisPic = axisPic + mvMatrix(mask,X-50,Y-50);
-        % move the pattern from (50,50) to (X,Y)     
-    end
-    axisReCell{i}=axisPic;
+for i=size(ContourList,2) 
+    unionPic = zeros(size(I,1),size(,2));
+    % trace the inside groups of contour
+   [contourPic,~] = spbMaskReconstruct(spb,{ContourList{1,i}},bbs,rect);
+   unionPic = unionPic + contourPic; 
+   % trace each group of contours one by one and add up their reconstructed
+   % patterns
+   axisReCell{i} = unionPic;
 end
 
 
 for i=1:numBoxes
     n = numGroupsInsideBox(ContourList,bbs(i,:)); % calculate n
     if n > 0
-        scores(i) = boxScore(bbs,pic,labelContour,axisReCell);
+        scores(i) = boxScore(bbs,ContourList,spb,rect,pic,labelContour);
     end
 end
 bbs(:,end) = scores;
@@ -79,8 +73,8 @@ Sortedbbs = sortrows(bbs,5); % Sort the matrix in terms of the score
     hold on;
     title('axis bbs');
     
-    for i=1:num           
-      drawBoxes(Sortedbbs(numBoxes+1-i,:)+[0 0 Sortedbbs(numBoxes+1-i,1) ...
+    for i=1:m           
+      figure(),drawBoxes(Sortedbbs(numBoxes+1-i,:)+[0 0 Sortedbbs(numBoxes+1-i,1) ...
           Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
           'color','red'); % Draw the boxes
     end
@@ -88,7 +82,7 @@ end
 
 
 % -------------------------------------------------------------------------
-function IOUScore = boxScore(bbs,pic,labelContour,axisReCell)
+function IOUScore = boxScore(bbs,contourList,spb,rect,pic,labelContour)
 
 x = bbs(1);
 y = bbs(2);
@@ -98,13 +92,14 @@ h = bbs(4);
 
 
 pic = pic>0;
-unionPic = zeros(size(pic,1),size(pic,2));
 
 % find out the union picture 
 for i=find(labelContour) 
-
-   unionPic = unionPic + axisReCell{i};
- 
+    % trace the inside groups of contour
+   [contourPic,~] = spbMaskReconstruct(spb,{contourList{1,i}},bbs,rect);
+   unionPic = unionPic + contourPic; 
+   % trace each group of contours one by one and add up their reconstructed
+   % patterns
 end
 
 unionPic = unionPic > 0;

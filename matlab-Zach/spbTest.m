@@ -40,7 +40,11 @@ labels = GestaltGroupRsvm(SegList,[1.1007 -0.0011],0.7); %  SegList,opt.Relative
 ContourList = GroupBB(labels, SegList);
 % bbs = Showbbs(ContourList,bbs,I,200,spb);
 
-%% 
-sortedbbs = spbScoreBoxes(ContourList,bbs,I,spb,200);
+%% IOU Score by reconstruct symmetry box
+sortedbbs = spbScoreBoxes(ContourList,bbs,I,spb,40);
+
+%% Axis Score by tracing each pixel
+Sortedbbs = spbShowbbs(ContourList,bbs,I,spb,40);
+
 
 
