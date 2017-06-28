@@ -1,4 +1,5 @@
 function J = mvMatrix(X,dx,dy)
+    % tanslation the original image by dx(right) nad dy(down)
     [h w]= size(X);
     
     XaddMatrix = zeros(h,abs(dx));
