@@ -26,7 +26,7 @@ imwrite(E, edges_fname, 'png');
 
 
 bbs=edgeBoxes(I,model,opts); % get bbs
-E = spb.thin>0.1;
+E = spb.thin;
 
 
 %% Get PG Grouping Result
@@ -38,6 +38,9 @@ labels = GestaltGroupRsvm(SegList,[1.1007 -0.0011],0.7); %  SegList,opt.Relative
 % show grouping result
 % showGrouping(SegList,labels,edges_fname); 
 ContourList = GroupBB(labels, SegList);
-bbs = Showbbs(ContourList,bbs,I,200,spb);
+% bbs = Showbbs(ContourList,bbs,I,200,spb);
 
 %% 
+sortedbbs = spbScoreBoxes(ContourList,bbs,I,spb,200);
+
+

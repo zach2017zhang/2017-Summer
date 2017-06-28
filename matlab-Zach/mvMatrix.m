@@ -8,7 +8,7 @@ function J = mvMatrix(X,dx,dy)
         dx = abs(dx);
         J = [X(:,dx+1:w) XaddMatrix];
     end
-    size(J);
+    
     
     YaddMatrix = zeros(abs(dy),w);
     if dy>0
