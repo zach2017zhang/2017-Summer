@@ -30,21 +30,19 @@ scores = zeros(numBoxes,1);
 % 
 % Do these steps and then I will take another look at the code. 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-rect = getMask(spb); %%%%% 1.rect{s,o}%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+rect = getMask(spb);
 % rect{s,o} is a picture of a rectangle, whose center is also at (50,50)
+% (1.rect{s,o})
 
 
 % precalcualte the reconstructed image
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 2. find contour groups inside & 3. label the contour groups inside(not entirely)
-[pic,labelContour] = spbMaskReconstruct(spb,ContourList,bbs,rect);%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%(2. find contour groups inside & 3. label the contour groups inside(not entirely)
+[pic,labelContour] = spbMaskReconstruct(spb,ContourList,bbs,rect);
 
 % precalcualte the reconstructed image for each contour group
-axisReCell={};
-numContours = size(ContourList,2); % # of contour groups
+axisReCell={}; % store the precalculated reconstructed medial axises
+numContours = size(ContourList,2); 
 
 for i=1:numContours
     numPixels = size(ContourList{1,i},1);
@@ -55,12 +53,13 @@ for i=1:numContours
         mask = rect{spb.scalesMap(Y,X),spb.orientMap(Y,X)};
         % extract the correct rectangle from precalculated rect{}
         axisPic = axisPic + mvMatrix(mask,X-50,Y-50);
-        % move the pattern from (50,50) to (X,Y)     
+        % move the pattern from (50,50) to (X,Y) and add up every pixels    
     end
-    axisReCell{i}=axisPic;
+    axisReCell{i}=axisPic; % stroe into axisReCell{}
 end
 
 
+% rescore bbs
 for i=1:numBoxes
     n = numGroupsInsideBox(ContourList,bbs(i,:)); % calculate n
     if n > 0
@@ -71,19 +70,17 @@ bbs(:,end) = scores;
 Sortedbbs = sortrows(bbs,5); % Sort the matrix in terms of the score
 
     
-    % Selectedbbs = Sortedbbs(numBoxes+1-m:numBoxes,5); % Extract the top m score
-    % Normbbs = (Selectedbbs - min(Selectedbbs))/(max(Selectedbbs) - ...
-    %     min(Selectedbbs)); % Normalize the selected score for drawBoxes function
-    
-    figure(),im(I);
-    hold on;
-    title('axis bbs');
-    
-    for i=1:num           
-      drawBoxes(Sortedbbs(numBoxes+1-i,:)+[0 0 Sortedbbs(numBoxes+1-i,1) ...
-          Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
-          'color','red'); % Draw the boxes
-    end
+
+% plot the result    
+figure(),im(I);
+hold on;
+title('axis bbs');
+
+for i=1:num           
+  drawBoxes(Sortedbbs(numBoxes+1-i,:)+[0 0 Sortedbbs(numBoxes+1-i,1) ...
+      Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
+      'color','red'); % Draw the boxes
+end
 end
 
 
@@ -102,9 +99,7 @@ unionPic = zeros(size(pic,1),size(pic,2));
 
 % find out the union picture 
 for i=find(labelContour) 
-
    unionPic = unionPic + axisReCell{i};
- 
 end
 
 unionPic = unionPic > 0;
@@ -119,7 +114,9 @@ interPic(x+w:end,:)=0;
 interPic(:,y+h:end)=0;
 
 interArea = sum(interPic(:));% count the pixels to represent area
-IOUScore = interArea/unionArea;
+IOUScore = interArea^2/unionArea;
+
+
 
 
 
