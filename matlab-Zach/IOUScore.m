@@ -1,4 +1,4 @@
-function IOUScore = IOUScore(bbs,ContourList,spb,rect)
+function Score = IOUScore(bbs,ContourList,spb,rect)
 
 x = bbs(1);
 y = bbs(2);
@@ -27,4 +27,7 @@ interPic(:,x+w:end)=0;
 interPic(y+h:end,:)=0;
 interArea = sum(interPic(:));
 IOUScore = interArea/unionArea; % count the pixels to represent area
+
+numAxis = size(find(labelContour),2); % # of axes inside bbs
+Score = interPic/(w*h)^2/numAxis * IOUScore;
 end

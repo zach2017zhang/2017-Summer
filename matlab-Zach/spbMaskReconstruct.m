@@ -25,8 +25,8 @@ for i=1:numContours
         Y = ContourList{1,i}(j,1);
         mask = rect{spb.scalesMap(Y,X),spb.orientMap(Y,X)};
         % extract the correct rectangle from precalculated rect{}
-        pic = pic + mvMatrix(mask,X-50,Y-50);
-        % move the pattern from (50,50) to (X,Y)
+        pic = pic + mvMatrix(mask,X-100,Y-100);
+        % move the pattern from (100,100) to (X,Y)
         
         if (minX<=X && X<=maxX) && (minY<=Y && Y<=maxY)&& (labelContour(i)~=1) % if inside and unlabeled
             labelContour(i)=1; % label the contours inside   

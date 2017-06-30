@@ -32,7 +32,7 @@ scores = zeros(numBoxes,1);
 
 
 rect = getMask(spb);
-% rect{s,o} is a picture of a rectangle, whose center is also at (50,50)
+% rect{s,o} is a picture of a rectangle, whose center is also at (100,100)
 % (1.rect{s,o})
 
 
@@ -52,8 +52,8 @@ for i=1:numContours
         Y = ContourList{1,i}(j,1);
         mask = rect{spb.scalesMap(Y,X),spb.orientMap(Y,X)};
         % extract the correct rectangle from precalculated rect{}
-        axisPic = axisPic + mvMatrix(mask,X-50,Y-50);
-        % move the pattern from (50,50) to (X,Y) and add up every pixels    
+        axisPic = axisPic + mvMatrix(mask,X-100,Y-100);
+        % move the pattern from (100,100) to (X,Y) and add up every pixels    
     end
     axisReCell{i}=axisPic; % stroe into axisReCell{}
 end
@@ -63,7 +63,7 @@ end
 for i=1:numBoxes
     n = numGroupsInsideBox(ContourList,bbs(i,:)); % calculate n
     if n > 0
-        scores(i) = boxScore(bbs,pic,labelContour,axisReCell);
+        scores(i) = boxScore(bbs,pic,labelContour,axisReCell,n);
     end
 end
 bbs(:,end) = scores;
@@ -85,7 +85,7 @@ end
 
 
 % -------------------------------------------------------------------------
-function IOUScore = boxScore(bbs,pic,labelContour,axisReCell)
+function Score = boxScore(bbs,pic,labelContour,axisReCell,n)
 
 x = bbs(1);
 y = bbs(2);
@@ -114,8 +114,15 @@ interPic(x+w:end,:)=0;
 interPic(:,y+h:end)=0;
 
 interArea = sum(interPic(:));% count the pixels to represent area
-IOUScore = interArea^2/unionArea;
+IOUScore = interArea/unionArea;
 
+
+if n~=0
+    Score = IOUScore * interArea/(w*h)^2/n;
+else
+    Score = 0;
+    
+end
 
 
 

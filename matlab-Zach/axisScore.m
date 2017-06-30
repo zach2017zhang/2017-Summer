@@ -27,7 +27,7 @@ function s = axisScore(ContourList,spb,sbbs,E,n)
     ScalesMap = spb.scalesMap;
     axisScalesArray = spb.scales(ScalesMap(logical(axisMatrix)));
     axisArea = 2 * sum(axisScalesArray);
-    if n==1
+    if n~=0
         s = axisArea/boxArea^2/n;
     else
         s = 0;
