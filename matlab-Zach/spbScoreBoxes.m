@@ -1,4 +1,4 @@
-function Sortedbbs = spbScoreBoxes(ContourList,bbs,I,spb,num)
+function Sortedbbs = spbScoreBoxes(ContourList,bbs,I,spb)
 % I will layout the steps that you have to code to make it easier for you.
 % It's better if you (at least try to) do it yourself for practice.
 
@@ -72,15 +72,16 @@ Sortedbbs = sortrows(bbs,5); % Sort the matrix in terms of the score
     
 
 % plot the result    
-figure(),im(I);
-hold on;
-title('axis bbs');
+% figure(),im(I);
+% hold on;
+% title('axis bbs');
 
-for i=1:num           
-  drawBoxes(Sortedbbs(numBoxes+1-i,:)+[0 0 Sortedbbs(numBoxes+1-i,1) ...
-      Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
-      'color','red'); % Draw the boxes
-end
+% for i=1:num           
+%  drawBoxes(Sortedbbs(numBoxes+1-i,:)+[0 0 Sortedbbs(numBoxes+1-i,1) ...
+%      Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
+%      'color','red'); % Draw the boxes
+
+% end
 end
 
 
