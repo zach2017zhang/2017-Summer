@@ -57,7 +57,7 @@ function recall = boxesEvalAll( o )
 M=length(o.cnts); T=length(o.thrs); K=length(o.names);
 gt=o.data.gt; n=min(o.maxn,o.data.n); gt=gt(1:n);
 recall=zeros(M,T,K); [ms,ts,ks]=ndgrid(1:M,1:T,1:K);
-parfor i=1:M*T*K, m=ms(i); t=ts(i); k=ks(i);
+parfor i=1:M*T*K, m=ms(i); t=ts(i); k=ks(i); % parfor i=1:M*T*K,
   % if evaluation result exists simply load it
   rdir=[o.resDir '/eval/' o.names{k} '/' o.data.split '/'];
   rnm=[rdir 'N' int2str2(n,5) '-W' int2str2(o.cnts(m),5) ...

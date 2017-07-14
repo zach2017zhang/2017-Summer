@@ -21,14 +21,32 @@ gt=[122 248 92 65; 193 82 71 53; 410 237 101 81; 204 160 114 95; ...
   9 185 86 90; 389 93 120 117; 253 103 107 57; 81 140 91 63];
 if(0), gt='Please select an object box.'; disp(gt); figure(1); imshow(I);
   title(gt); [~,gt]=imRectRot('rotate',0); gt=gt.getPos(); end
-gt(:,5)=0; [gtRes,dtRes]=bbGt('evalRes',gt,double(bbs),.7);
+gt(:,5)=0; [gtRes,dtRes]=bbGt('evalRes',gt,double(bbs),.7.);
 figure(1); bbGt('showRes',I,gtRes,dtRes(dtRes(:,6)==1,:));
 title('green=matched gt  red=missed gt  dashed-green=matched detect');
 
 %% run and evaluate on entire dataset (see boxesData.m and boxesEval.m)
 if(~exist('boxes/VOCdevkit/','dir')), return; end
-split='val'; data=boxesData('split',split);
+split='val'; data=boxesDatafortest('split',split);
 nm='EdgeBoxes70'; opts.name=['boxes/' nm '-' split '.mat'];
-% edgeBoxes(data.imgs,model,opts); opts.name=[];
+%edgeBoxes(data.imgs,model,opts); opts.name=[];
 edgeBoxesfortest(data.imgs,model,opts); opts.name=[];
-boxesEval('data',data,'names',nm,'thrs',.7,'show',2,'cnts',1000);
+
+boxesEval('data',data,'names',nm,'thrs',.5,'show',2,'cnts',1000);
+%%
+A1=boxesEval('data',data,'names',nm,'thrs',.6,'show',2,'cnts',1000);
+A2=boxesEval('data',data,'names',nm,'thrs',.7,'show',2,'cnts',1000);
+A3=boxesEval('data',data,'names',nm,'thrs',.8,'show',2,'cnts',1000);
+A4=boxesEval('data',data,'names',nm,'thrs',.9,'show',2,'cnts',1000);
+
+A5=boxesEval('data',data,'names',nm,'thrs',.5,'show',2,'cnts',5000);
+A6=boxesEval('data',data,'names',nm,'thrs',.6,'show',2,'cnts',5000);
+A7=boxesEval('data',data,'names',nm,'thrs',.7,'show',2,'cnts',5000);
+A8=boxesEval('data',data,'names',nm,'thrs',.8,'show',2,'cnts',5000);
+A9=boxesEval('data',data,'names',nm,'thrs',.9,'show',2,'cnts',5000);
+
+b5=boxesEval('data',data,'names',nm,'thrs',.5,'show',2,'cnts',10000);
+b6=boxesEval('data',data,'names',nm,'thrs',.6,'show',2,'cnts',10000);
+b7=boxesEval('data',data,'names',nm,'thrs',.7,'show',2,'cnts',10000);
+b8=boxesEval('data',data,'names',nm,'thrs',.8,'show',2,'cnts',10000);
+b9=boxesEval('data',data,'names',nm,'thrs',.9,'show',2,'cnts',10000);

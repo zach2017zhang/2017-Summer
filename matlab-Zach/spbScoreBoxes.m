@@ -1,4 +1,4 @@
-function Sortedbbs = spbScoreBoxes(ContourList,bbs,I,spb)
+function Sortedbbs = spbScoreBoxes(ContourList,bbs,I,spb,num)
 % I will layout the steps that you have to code to make it easier for you.
 % It's better if you (at least try to) do it yourself for practice.
 
@@ -38,50 +38,53 @@ rect = getMask(spb);
 
 % precalcualte the reconstructed image
 %(2. find contour groups inside & 3. label the contour groups inside(not entirely)
-[pic,labelContour] = spbMaskReconstruct(spb,ContourList,bbs,rect);
+[pic,axisGroupMap,axisReCell] = spbMaskReconstruct(spb,ContourList,rect);
 
 % precalcualte the reconstructed image for each contour group
-axisReCell={}; % store the precalculated reconstructed medial axises
-numContours = size(ContourList,2); 
+%numContours = size(ContourList,2); 
+%axisReCell=cell(1,numContours); % store the precalculated reconstructed medial axises
+%picCenterY = int16(size(I,1)/2);
+%picCenterX = int16(size(I,2)/2);
 
-for i=1:numContours
-    numPixels = size(ContourList{1,i},1);
-    axisPic = zeros(size(I,1),size(I,2));
-    for j=1:numPixels
-        X = ContourList{1,i}(j,2);
-        Y = ContourList{1,i}(j,1);
-        mask = rect{spb.scalesMap(Y,X),spb.orientMap(Y,X)};
-        % extract the correct rectangle from precalculated rect{}
-        axisPic = axisPic + mvMatrix(mask,X-100,Y-100);
-        % move the pattern from (100,100) to (X,Y) and add up every pixels    
-    end
-    axisReCell{i}=axisPic; % stroe into axisReCell{}
-end
-
+%for i=1:numContours
+%    numPixels = size(ContourList{1,i},1);
+%    axisPic = zeros(size(I,1),size(I,2));
+%    for j=1:numPixels
+%        X = ContourList{1,i}(j,2);
+%        Y = ContourList{1,i}(j,1);
+%        mask = rect{spb.scalesMap(Y,X),spb.orientMap(Y,X)};
+%        % extract the correct rectangle from precalculated rect{}
+%        axisPic = axisPic + mvMatrix(mask,X-picCenterX,Y-picCenterY);
+%        % move the pattern from (100,100) to (X,Y) and add up every pixels    
+%    end
+%    axisReCell{i}=axisPic; % store into axisReCell{}
+%end
 
 % rescore bbs
 for i=1:numBoxes
-    n = numGroupsInsideBox(ContourList,bbs(i,:)); % calculate n
+
+    
+    [n,labelContour] = numGroupsBoxCover(axisGroupMap,bbs(i,:));
+
     if n > 0
-        scores(i) = boxScore(bbs,pic,labelContour,axisReCell,n);
+        scores(i) = boxScore(bbs(i,:),pic,labelContour,axisReCell,n);
     end
 end
 bbs(:,end) = scores;
 Sortedbbs = sortrows(bbs,5); % Sort the matrix in terms of the score
 
     
+%plot the result    
+figure(),im(I);
+hold on;
+title('axis bbs');
 
-% plot the result    
-% figure(),im(I);
-% hold on;
-% title('axis bbs');
+for i=1:num           
+  drawBoxes(Sortedbbs(numBoxes+1-i,:)+[0 0 Sortedbbs(numBoxes+1-i,1) ...
+      Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
+      'color','red'); % Draw the boxes
 
-% for i=1:num           
-%  drawBoxes(Sortedbbs(numBoxes+1-i,:)+[0 0 Sortedbbs(numBoxes+1-i,1) ...
-%      Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
-%      'color','red'); % Draw the boxes
-
-% end
+end
 end
 
 
@@ -94,13 +97,14 @@ w = bbs(3);
 h = bbs(4);
 
 
-
 pic = pic>0;
 unionPic = zeros(size(pic,1),size(pic,2));
 
 % find out the union picture 
-for i=find(labelContour) 
-   unionPic = unionPic + axisReCell{i};
+for i= labelContour
+   if i~= 0
+    unionPic = unionPic + axisReCell{i};
+   end
 end
 
 unionPic = unionPic > 0;
@@ -119,15 +123,11 @@ IOUScore = interArea/unionArea;
 
 
 if n~=0
-    Score = IOUScore * interArea/(w*h)^2/n;
+    Score = IOUScore/n;%/n*interArea/(w*h)^2;
 else
     Score = 0;
     
 end
-
-
-
-
 
 end
     

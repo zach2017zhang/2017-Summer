@@ -1,4 +1,4 @@
-function Sortedbbs = spbShowbbs(ContourList,bbs,I,spb) 
+function Sortedbbs = spbShowbbs(ContourList,bbs,I,spb,E) 
     
     numBoxes = size(bbs,1); % Get the number of boxes proposed
     
@@ -7,8 +7,8 @@ function Sortedbbs = spbShowbbs(ContourList,bbs,I,spb)
     for i=1:numBoxes
        n = numGroupsInsideBox(ContourList,bbs(i,:)); % calculate n
        if n > 0
-           scores(i) =  ... %PGScore(ContourList,bbs(i,:), I, n); 
-                          axisScore(ContourList,spb,bbs(i,:),I,n); % Calculate PG score
+           scores(i) =   ... %PGScore(ContourList,bbs(i,:), I, n)+... 
+                           axisScore(ContourList,bbs(i,:),spb,E,n); % Calculate PG score
        end
     end
     bbs(:,end) = scores;
@@ -25,8 +25,8 @@ function Sortedbbs = spbShowbbs(ContourList,bbs,I,spb)
     
     % for i=1:num          
     %     drawBoxes(Sortedbbs(numBoxes+1-i,:)+[0 0 Sortedbbs(numBoxes+1-i,1) ...
-    %     Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
-    %      'color','red'); % Draw the boxes
+    %    Sortedbbs(numBoxes+1-i,2) 0],'lineWidth',1,...% 'scores',Normbbs(m+1-i),...
+    %    'color','red'); % Draw the boxes
     % end
   
 end

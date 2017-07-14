@@ -1,4 +1,4 @@
-function bbs = edgeBoxesfortest( I, model, varargin )
+function bbs = edgeBoxesSta( I, model, varargin )
 % Generate Edge Boxes object proposals in given image(s).
 %
 % Compute Edge Boxes object proposals as described in:
@@ -71,11 +71,10 @@ o=getPrmDflt(varargin,dfs,1); if(nargin==0), bbs=o; return; end
 
 % run detector possibly over multiple images and optionally save results
 f=o.name; if(~isempty(f) && exist(f,'file')), bbs=1; return; end
-
 if(~iscell(I)), bbs=edgeBoxesImg(I,model,o); else n=length(I);
   bbs=cell(n,1); 
-  parfor i=1:n,
-  %for i=1:n, 
+%  for i=1:n, 
+   parfor i=1:n, 
       bbs{i}=edgeBoxesImg(I{i},model,o); fprintf('%d\n',i);
   end; 
 end
@@ -85,44 +84,34 @@ if(~isempty(f)), save(f,'bbs'); bbs=1; end
 end
 
 function bbs = edgeBoxesImg( I, model, o )
-%milPath = strrep(I,'boxes/VOCdevkit/VOC2007/JPEGImages/','/u/zhan2212/Desktop/2007/MilResult/');
-%milPath = strrep(milPath,'.jpg','.mat');
-
 % Generate Edge Boxes object proposals in single image.
-path = strrep(I,'JPEGImages/','SegmentationObject/');
-path = strrep(path,'.jpg','.png');
-PIC= imread(path);
-
+[~,imageId] = fileparts(I);
 if(all(ischar(I))), I=imread(I); end
-model.opts.nms=0; [E,O]=edgesDetect(I,model);
+model.opts.nms=0; 
+[E,O]=edgesDetect(I,model); % edge map
 if(0), E=gradientMag(convTri(single(I),4)); E=E/max(E(:)); end
 E=edgesNmsMex(E,O,2,0,1,model.opts.nThreads);
 bbs=edgeBoxesMex(E,O,o.alpha,o.beta,o.minScore,o.maxBoxes,...
  o.edgeMinMag,o.edgeMergeThr,o.clusterMinMag,...
  o.maxAspectRatio,o.minBoxArea,o.gamma,o.kappa);
 
-
-
-%load(milPath);
-
-%fprintf('\n');
-%E = spb.thin>0.1;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% f = o.name
-%SegList  = GetConSeg(E);
-%labels = GestaltGroupRsvm(SegList,[1.1007 -0.0011],0.5000);
-% ContourList = GroupBB(labels, SegList);
- 
-% fprintf('contourlist%d\n',size(ContourList,2));
- 
- 
-% 1. newContourList =  colorGroup(ContourList,I);bbs = spbScoreBoxes(newContourList,bbs,I,spb);
-% 2. bbs =  spbShowbbs(ContourList,bbs,I,spb);
-% 3. newContourList =  colorGroup(ContourList,I); bbs =  spbShowbbs(newContourList,bbs,I,spb,E);
-% 4. bbs = ScoringBoxesMex(SegList,labels,[1.1007 -0.0011],O,E,o.alpha,...
-      %o.beta,o.minBoxArea,o.maxAspectRatio,o.maxBoxes);
-% 5.
-bbs = groundTruthTest(bbs,I,PIC);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+switch model.opts.scoringMethod
+    case {'spbmil', 'spb'}
+        % @Zach: Add "data" directory and inside it a sym link to MilResult
+        milPath = fullfile('data','MilResult',[imageId '.mat']);
+        % In our case, the edge map is only used to compute bounding box proposals
+        spb = load(milPath); spb = spb.spb; % symmetry map
+        E = spb.thin>0.3;   % TODO: decide on threshold
+        SegList  = GetConSeg(E);
+        labels = GestaltGroupRsvm(SegList,[1.1007 -0.0011],0.5000);
+        contourList = groupContours(labels, SegList);
+        fprintf('contourlist%d\n',size(contourList,2));
+        bbs =  spbShowbbs(contourList,bbs,I,spb);
+    case {'pgroup', 'pg'}
+        SegList  = GetConSeg(E);
+        labels = GestaltGroupRsvm(SegList,[1.1007 -0.0011],0.5000);
+        bbs = ScoringBoxesMex(SegList,labels,[1.1007 -0.0011],O,E,o.alpha,...
+            o.beta,o.minBoxArea,o.maxAspectRatio,o.maxBoxes);
+    otherwise % do nothing
+end
 end

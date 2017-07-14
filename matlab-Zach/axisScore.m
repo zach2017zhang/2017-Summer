@@ -1,14 +1,14 @@
-function s = axisScore(ContourList,spb,sbbs,E,n)
-    axisMatrix = spb.thin>0.3;
+function s = axisScore(ContourList,sbbs,spb,E,n)
+    axisMatrix = E;
     m = sbbs(1);
     k = sbbs(2);
     w = sbbs(3);
     h = sbbs(4);
     
-    axisMatrix(1:m,:)=0;
-    axisMatrix(:,1:k)=0;
-    axisMatrix(m+w:end,:)=0;
-    axisMatrix(:,k+h:end)=0;
+    axisMatrix(:,1:m)=0;
+    axisMatrix(1:k,:)=0;
+    axisMatrix(:,m+w:end)=0;
+    axisMatrix(k+h:end,:)=0;
     
     
     %  k = bwconvhull(axisMatrix);

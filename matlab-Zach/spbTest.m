@@ -1,7 +1,7 @@
 %% 
 %% Load the Picture and Spb
-I = imread('/u/zhan2212/Desktop/2007/VOCdevkit/VOC2007/JPEGImages/000319.jpg');
-load('/u/zhan2212/Desktop/2007/MilResult/000319.mat');
+I = imread('/u/zhan2212/Desktop/2007/VOCdevkit/VOC2007/JPEGImages/000616.jpg');
+load('/u/zhan2212/Desktop/2007/MilResult/000616.mat');
 %% load models for bbs
 
 % load pre-trained edge detection model and set opts (see edgesDemo.m)
@@ -26,25 +26,26 @@ imwrite(E, edges_fname, 'png');
 
 
 bbs=edgeBoxes(I,model,opts); % get bbs
-E = spb.thin;
+E = spb.thin>0.1;
 
 
 %% Get PG Grouping Result
 
 SegList  = GetConSeg(E);
 % obtain perceptual grouping result by graph-cuts
-labels = GestaltGroupRsvm(SegList,[1.1007 -0.0011],0.7); %  SegList,opt.RelativeImp,opt.C
+labels = GestaltGroupRsvm(SegList,[1.1007 -0.0011],0.5000); %  SegList,opt.RelativeImp,opt.C
 
 % show grouping result
 % showGrouping(SegList,labels,edges_fname); 
 ContourList = GroupBB(labels, SegList);
 % bbs = Showbbs(ContourList,bbs,I,200,spb);
+% newContourList =  colorGroup(ContourList,I);
 
 %% IOU Score by reconstruct symmetry box
-sortedbbs = spbScoreBoxes(ContourList,bbs,I,spb,40);
+sortedbbs = spbScoreBoxes2(ContourList,bbs,I,spb,100);
 
 %% Axis Score by tracing each pixel
-Sortedbbs = spbShowbbs(ContourList,bbs,I,spb,40);
+Sortedbbs = spbShowbbs(ContourList,bbs,I,spb,E,100);
 
 
 
