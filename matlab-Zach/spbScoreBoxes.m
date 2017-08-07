@@ -1,10 +1,7 @@
 function Sortedbbs = spbScoreBoxes(ContourList,bbs,I,spb,num)
 % I will layout the steps that you have to code to make it easier for you.
 % It's better if you (at least try to) do it yourself for practice.
-
-numBoxes = size(bbs,1); % Get the number of boxes proposed
-scores = zeros(numBoxes,1);
-
+%
 % As we discussed, spb.scalesMap and spb.orientMap contain *indices* of the
 % estimated scale and orientation at each point. spb.scales and spb.thetas
 % contain the ranges of the actual values for rectangle sides and
@@ -30,49 +27,43 @@ scores = zeros(numBoxes,1);
 % 
 % Do these steps and then I will take another look at the code. 
 
+Ysize = size(I,1); % size of the picture in Y direction
+Xsize = size(I,2); % size of the picture in X direction
+picCenterY = int16(Ysize/2); % position of the midpoint in Y direction
+picCenterX = int16(Xsize/2); % position of the midpoint in X direction
 
-rect = getMask(spb);
-% rect{s,o} is a picture of a rectangle, whose center is also at (100,100)
-% (1.rect{s,o})
+numBoxes = size(bbs,1); % the number of boxes proposed
+IOUscores = zeros(numBoxes,1); 
 
 
-% precalcualte the reconstructed image
-%(2. find contour groups inside & 3. label the contour groups inside(not entirely)
-[pic,axisGroupMap,axisReCell] = spbMaskReconstruct(spb,ContourList,rect);
+rect = getMask(spb); % precalculate all the combinations, rect{s,o} 
+                     % represents a rectangle at scale s and orientation o
 
-% precalcualte the reconstructed image for each contour group
-%numContours = size(ContourList,2); 
-%axisReCell=cell(1,numContours); % store the precalculated reconstructed medial axises
-%picCenterY = int16(size(I,1)/2);
-%picCenterX = int16(size(I,2)/2);
+maskReCell = cell(Ysize,Xsize);
 
-%for i=1:numContours
-%    numPixels = size(ContourList{1,i},1);
-%    axisPic = zeros(size(I,1),size(I,2));
-%    for j=1:numPixels
-%        X = ContourList{1,i}(j,2);
-%        Y = ContourList{1,i}(j,1);
-%        mask = rect{spb.scalesMap(Y,X),spb.orientMap(Y,X)};
-%        % extract the correct rectangle from precalculated rect{}
-%        axisPic = axisPic + mvMatrix(mask,X-picCenterX,Y-picCenterY);
-%        % move the pattern from (100,100) to (X,Y) and add up every pixels    
-%    end
-%    axisReCell{i}=axisPic; % store into axisReCell{}
-%end
 
-% rescore bbs
-for i=1:numBoxes
-
-    
-    [n,labelContour] = numGroupsBoxCover(axisGroupMap,bbs(i,:));
-
-    if n > 0
-        scores(i) = boxScore(bbs(i,:),pic,labelContour,axisReCell,n);
+for i=1:size(ContourList,2)
+    numPixels = size(ContourList{1,i},1);    
+    for j=1:numPixels
+        X = ContourList{1,i}(j,2);
+        Y = ContourList{1,i}(j,1);
+        mask = rect{spb.scalesMap(Y,X),spb.orientMap(Y,X)};
+        maskReCell{Y,X} = mvMatrix(mask,X-picCenterX,Y-picCenterY);
+        % translate the precalculated rectangle to its original position
+        % and store them into maskReCell{}
     end
 end
-bbs(:,end) = scores;
-Sortedbbs = sortrows(bbs,5); % Sort the matrix in terms of the score
 
+
+for i=1:numBoxes
+    % rescore bbs
+    IOU = boxScore(bbs(i,:),ContourList,maskReCell,Ysize,Xsize);
+    IOUscores(i) = IOU;
+    
+end
+bbs(:,end) = IOUscores;
+Sortedbbs = sortrows(bbs,5); % Sort the matrix in terms of the score
+Sortedbbs = flipud(Sortedbbs);% flip, make the scores in descending order
     
 %plot the result    
 figure(),im(I);
@@ -85,49 +76,78 @@ for i=1:num
       'color','red'); % Draw the boxes
 
 end
+
 end
 
 
 % -------------------------------------------------------------------------
-function Score = boxScore(bbs,pic,labelContour,axisReCell,n)
-
-x = bbs(1);
-y = bbs(2);
-w = bbs(3);
-h = bbs(4);
+function IOU = boxScore(sbbs,ContourList,maskReCell,Ysize,Xsize)
 
 
-pic = pic>0;
-unionPic = zeros(size(pic,1),size(pic,2));
+x = sbbs(1);
+y = sbbs(2);
+w = sbbs(3);
+h = sbbs(4);
 
-% find out the union picture 
-for i= labelContour
-   if i~= 0
-    unionPic = unionPic + axisReCell{i};
-   end
+
+unionPic = zeros(Ysize,Xsize);
+
+numAxisInside = 0;
+
+for i=1:size(ContourList,2)
+    inside = 0;
+    numPixels = size(ContourList{1,i},1);
+    
+    for j=1:numPixels
+        X = ContourList{1,i}(j,2);
+        Y = ContourList{1,i}(j,1);
+
+        if (x+w>X)&&(X>x)&&(h+y>Y)&&(Y>y)
+            Recell = maskReCell{Y,X}; % load the precalculated mask, which 
+                                      % is already in the right position
+            
+            % exclude the pixels outside the bbox
+            NewRecell=Recell;
+            NewRecell(1:y,:)=0; 
+            NewRecell(:,1:x)=0;
+            NewRecell(:,x+w:end)=0;
+            NewRecell(y+h:end,:)=0;
+            
+            axisReArea = sum(NewRecell(:));% the area of a certain group of 
+                                           % medial axis inside a bbox
+                                           
+            if axisReArea > 0.05*(w*h) % set the threshold of 5%
+                unionPic = unionPic + Recell; % add up all the masks for reconstruction
+                inside=1;
+            end
+        end
+        
+    end
+   
+    numAxisInside =numAxisInside+inside; % number of the groups of medial axes inside the bbox
 end
 
+interPic = unionPic;
+interPic(1:y,:)=0; 
+interPic(:,1:x)=0;
+interPic(:,x+w:end)=0;
+interPic(y+h:end,:)=0;
+
+interPic = interPic > 0;
 unionPic = unionPic > 0;
 unionPic(y:y+h,x:x+w) = 1;
 unionArea = sum(unionPic(:));% count the pixels to represent area
 
-interPic = pic; % find out the intersection part of box and contours
-% exclude the part of contours outside the boox 
-interPic(1:x,:)=0; 
-interPic(:,1:y)=0;
-interPic(x+w:end,:)=0;
-interPic(:,y+h:end)=0;
+
 
 interArea = sum(interPic(:));% count the pixels to represent area
 IOUScore = interArea/unionArea;
 
 
-if n~=0
-    Score = IOUScore/n;%/n*interArea/(w*h)^2;
+if numAxisInside~=0
+    IOU = IOUScore;
 else
-    Score = 0;
-    
+    IOU = 0; 
 end
 
 end
-    

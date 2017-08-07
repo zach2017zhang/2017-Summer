@@ -43,6 +43,7 @@ function score = groundTruthScore(sbbs,E,objectAreaCell)
     w = sbbs(3);
     h = sbbs(4);
     
+   
     interPic(:,1:m)=0;
     interPic(1:k,:)=0;
     interPic(:,m+w:end)=0;
@@ -60,10 +61,13 @@ function score = groundTruthScore(sbbs,E,objectAreaCell)
     for i=1:numObject
         ob=Object(i);
         if (~isequal(ob,0))&&(~isequal(ob,255))
-            n = n+1;
-            interArea = interArea + size(find(interPic==ob),1);
-            % unionArea = unionArea + objectAreaCell{m};
-            unionPic = unionPic + double(E==ob).*double(E);
+            area = size(find(interPic==ob),1);
+            if area >= 0.05 *(w*h) % 5% threshold
+                n = n+1;
+                interArea = interArea + area;
+                % unionArea = unionArea + objectAreaCell{m};
+                unionPic = unionPic + double(E==ob).*double(E);
+            end
             
         end
     end
@@ -74,7 +78,7 @@ function score = groundTruthScore(sbbs,E,objectAreaCell)
     IOU = interArea/unionArea;
     
     if n~=0
-        score = IOU;% interArea/(w*h)^2/n;%;IOU/n
+        score = IOU*(w*h)/unionArea;% interArea/(w*h)^2/n;%;IOU/n
     else
         score =0;
     end

@@ -1,8 +1,9 @@
-function m = markPG(ContourList)
+function m = markPG(ContourList,I)
 
-for i=1:size(ContourList,2)
+figure(),im(I);
 hold on;
-figure(3),plot(ContourList{1,i}(:,2),ContourList{1,i}(:,1),'x');
+for i=1:size(ContourList,2)
+    plot(ContourList{1,i}(:,2),ContourList{1,i}(:,1),'x');
 end
 m=1;
 end

@@ -1,4 +1,4 @@
-function Sortedbbs = spbShowbbs(ContourList,bbs,I,spb,E) 
+function Sortedbbs = spbShowbbs(ContourList,bbs,I,spb) 
     
     numBoxes = size(bbs,1); % Get the number of boxes proposed
     
@@ -8,11 +8,13 @@ function Sortedbbs = spbShowbbs(ContourList,bbs,I,spb,E)
        n = numGroupsInsideBox(ContourList,bbs(i,:)); % calculate n
        if n > 0
            scores(i) =   ... %PGScore(ContourList,bbs(i,:), I, n)+... 
-                           axisScore(ContourList,bbs(i,:),spb,E,n); % Calculate PG score
+                           axisScore(ContourList,bbs(i,:),spb,n); % Calculate PG score
+                      
        end
     end
     bbs(:,end) = scores;
     Sortedbbs = sortrows(bbs,5); % Sort the matrix in terms of the score
+    Sortedbbs = flipud(Sortedbbs);% flip, from large to small
     
     
     % Selectedbbs = Sortedbbs(numBoxes+1-m:numBoxes,5); % Extract the top m score

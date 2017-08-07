@@ -1,7 +1,7 @@
 %% 
 %% Load the Picture and Spb
-I = imread('/u/zhan2212/Desktop/2007/VOCdevkit/VOC2007/JPEGImages/000616.jpg');
-load('/u/zhan2212/Desktop/2007/MilResult/000616.mat');
+I = imread('/home/zach/Desktop/2017-Summer/EdgeDetector/boxes/VOCdevkit/VOC2007/JPEGImages/000012.jpg');
+load('/home/zach/Desktop/MilResult/000012.mat');
 %% load models for bbs
 
 % load pre-trained edge detection model and set opts (see edgesDemo.m)
@@ -42,7 +42,7 @@ ContourList = GroupBB(labels, SegList);
 % newContourList =  colorGroup(ContourList,I);
 
 %% IOU Score by reconstruct symmetry box
-sortedbbs = spbScoreBoxes2(ContourList,bbs,I,spb,100);
+sortedbbs = spbScoreBoxes(ContourList,bbs,I,spb,20);
 
 %% Axis Score by tracing each pixel
 Sortedbbs = spbShowbbs(ContourList,bbs,I,spb,E,100);
